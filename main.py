@@ -18,12 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def getOne():
-    print("hello_world")
-    return detect_language("hello_world")
-
-
 @app.post("/detect-language")
 def echo_text(text_to_detect:Text_to_detect):
     print(text_to_detect.text)
