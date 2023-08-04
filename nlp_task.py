@@ -12,7 +12,7 @@ def detect_language(input_text):
     # STEP 3: Get the language detection result for the input text.
     detection_result = detector.detect(input_text)
 
-    print(detection_result)
+    # print(detection_result)
     # STEP 4: Process the detection result and return the language code.
     for detection in detection_result.detections:
         return detection.language_code
