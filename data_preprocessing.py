@@ -7,8 +7,6 @@ async def data_preprocessing(data):
     df = pd.read_excel(BytesIO(data))
     print(df.groupby('companyName').count())
     for index, row in df.iterrows():
-        # row is a Series with index as column names in the DataFrame.
-        # We convert it to a dictionary.
         data_dict = row.to_dict()
         
         # Convert premiumMale and premiumFemale to int
