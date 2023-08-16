@@ -2,7 +2,7 @@ from typing import Union
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
-from nlp_task import detect_language, recommend_insurances
+from nlp_task import detect_language, tagging_questions
 from data_preprocessing import data_preprocessing
 from typing import Optional
 
@@ -17,7 +17,7 @@ app = FastAPI()
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -31,8 +31,9 @@ async def echo_text(text_to_detect:Text_to_detect):
 #보험 상품 추천 기능
 @app.post("/recommendations")
 async def insurances_recommend(text_to_recommend: Text_to_recommend):
-    insurance_ids = await recommend_insurances(text_to_recommend.text)
-    return insurance_ids
+    tags = await tagging_questions(text_to_recommend.text)
+    print(tags)
+    return tags
 
 #보험 정보 db에 입력 기능
 @app.post("/create-insurances")
