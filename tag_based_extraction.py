@@ -14,7 +14,6 @@ def invert_dictionary(dictionary):
 def extract_info_from_tags(question):
     inverted_company_names = invert_dictionary(company_names_extended)
     tags = bioes_tagging(question)
-    # print(tags)
     words = question.split()
     info_dict = {}
     #완
@@ -212,4 +211,6 @@ def extract_info_from_tags(question):
     registration_type_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-registrationType"]
     if registration_type_tags:
         info_dict['Registration Type'] = registration_type_map[' '.join(registration_type_tags)]
+
+    
     return info_dict
