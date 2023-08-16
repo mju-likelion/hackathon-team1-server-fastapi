@@ -220,6 +220,7 @@ def bioes_tagging(question):
         # Check for registrationType
         registration_types = [
             "consultation-free",
+            "consultation free",
             "online-registration",
             "in-person visit",
             "mail-in application",

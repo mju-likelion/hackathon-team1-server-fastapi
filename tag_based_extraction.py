@@ -155,9 +155,10 @@ def extract_info_from_tags(question):
     if cancellation_refund_tags:
         info_dict['Cancellation Refund'] = cancellation_refund_tags[0]
         
+        
     # Extract registration type 
     registration_type_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-registrationType"]
     if registration_type_tags:
-        info_dict['Registration Type'] = registration_type_tags[0]
+        info_dict['Registration Type'] = ' '.join(registration_type_tags)
 
     return info_dict
