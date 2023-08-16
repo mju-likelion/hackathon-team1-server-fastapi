@@ -2,10 +2,19 @@ import pandas as pd
 
 import re
 # sys.path.append('tagging_logic')
-from tagging import bioes_tagging  
+from tagging import bioes_tagging, company_names_extended  
+
+def invert_dictionary(dictionary):
+    inverted_dict = {}
+    for key, values in dictionary.items():
+        for value in values:
+            inverted_dict[value] = key
+    return inverted_dict
 
 def extract_info_from_tags(question):
+    inverted_company_names = invert_dictionary(company_names_extended)
     tags = bioes_tagging(question)
+    # print(tags)
     words = question.split()
     info_dict = {}
     #완
@@ -19,14 +28,15 @@ def extract_info_from_tags(question):
     #완
     # Extract gender
     gender_map = {
-        'male': '남성',
-        'man': '남성',
-        "men's": '남성',
-        'his': '남성',
-        'female': '여성',
-        'woman': '여성',
-        'women': '여성',
-        'her': '여성'
+        'male': 'man',
+        'man': 'man',
+        "men's": 'man',
+        'his': 'man',
+        "men": 'man',
+        'female': 'female',
+        'woman': 'female',
+        'women': 'female',
+        'her': 'female'
     }
     gender_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-Gender"]
     if gender_tags:
@@ -39,11 +49,25 @@ def extract_info_from_tags(question):
         price = re.findall(r'\d+', price_word.replace(',', ''))[0]
         info_dict['Insurance Price'] = int(price)
 
+
+    range_map = {
+            "more cheap": 'less',
+            "or less": 'less',
+            "or over": 'over',
+            "over": 'over',
+            "less": 'less',
+            "around": 'around',
+            "below": 'less',
+            "under": 'less',
+            "up": 'over',
+            "less than": 'less',
+    }
+    
     #이상 이하 범위 리턴 완
     insurance_price_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-insurancePriceRange"]
     insurance_price_range_list = []    
     for insurance_price_range, range_word in insurance_price_range_tags:
-        range_list = [range_word]
+        range_list = [range_map[range_word]]
         window_size = 4
         start_idx = max(0, insurance_price_range - window_size)
         end_idx = min(len(tags), insurance_price_range + window_size + 1)
@@ -65,11 +89,21 @@ def extract_info_from_tags(question):
     if insurance_price_range_list:
         info_dict['Insurance Price Range Index'] = insurance_price_range_list
 
+    minmax_map = {
+       "most expensive": "max",
+            "very expensive": "min",
+            "most affordable": "max",
+            "cheapest": "min",
+            "mid-range": "mid",
+            "luxurious":"max",
+            "economical":"mid",
+    }
+     
     # 최대 최소 필터링 로직
     insurance_price_minmax_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-minmaxInsurancePriceRange"]
     insurance_price_minmax_range_list = []    
     for insurance_price_minmax, range_word in insurance_price_minmax_range_tags:
-        range_list = [range_word.replace(",", "")]
+        range_list = [minmax_map[range_word.replace(",", "")]]
         window_size = 4
         start_idx = max(0, insurance_price_minmax - window_size)
         end_idx = min(len(tags), insurance_price_minmax + window_size + 1)
@@ -89,7 +123,7 @@ def extract_info_from_tags(question):
         insurance_price_minmax_range_list.append(range_list)
         
     if insurance_price_minmax_range_list:
-        info_dict['Insurance Price Range Index'] = insurance_price_minmax_range_list
+        info_dict['Insurance Price MinMax Index'] = insurance_price_minmax_range_list
 
 
     # 보험 타입 (유병력자, 무병력자) 완
@@ -140,8 +174,13 @@ def extract_info_from_tags(question):
         else:
             i += 1  # 다음 인덱스로 이동
 
+    
     if company_name_tags:
-        info_dict['Company Name'] = company_name_tags
+        companys = []
+        for i in company_name_tags:
+            companys.append(inverted_company_names.get(i, []))
+    companys = [item for item in companys if item]
+    info_dict['Company Name'] = companys
 
 
     # Extract price index 완
@@ -154,11 +193,23 @@ def extract_info_from_tags(question):
     cancellation_refund_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-cancellationRefund"]
     if cancellation_refund_tags:
         info_dict['Cancellation Refund'] = cancellation_refund_tags[0]
-        
-        
+
+
+    registration_type_map = {
+            "consultation-free":"online",
+            "consultation free":"online",
+            "online-registration":"online",
+            "in-person visit":"visit",
+            "mail-in application":"mail",
+            "Agent-assisted":"agent",
+            "Agent assisted":"agent",
+            "agent assisted":"agent",
+            "Phone Enrollment":"agent",
+            "phone enrollment":"agent",
+            "agent":"agent",
+    }
     # Extract registration type 
     registration_type_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-registrationType"]
     if registration_type_tags:
-        info_dict['Registration Type'] = ' '.join(registration_type_tags)
-
+        info_dict['Registration Type'] = registration_type_map[' '.join(registration_type_tags)]
     return info_dict
