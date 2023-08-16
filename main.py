@@ -17,7 +17,7 @@ app = FastAPI()
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000","https://hackathon-team1-web-k8ep.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
