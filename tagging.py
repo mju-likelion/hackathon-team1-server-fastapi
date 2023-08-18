@@ -18,12 +18,16 @@ company_names_extended = {
         "Samsung's",
     ],
     "Hanwha Non-Life Insuranace": ["Hanwha Non-Life", "Hanwha", "Hanwha's"],
-    "Hanwha Life Insurance": ["Hanwha Life", "Hanwha", "Hanwha's"],
+    "Hanwha Life Insurance": ["Hanwha Life", "Hanwha", "Hanwha's", "Korean currency","Korean"],
     "Hyundai Marine & Fire Insurance": [
         "Hyundai Marine & Fire",
         "Hyundai",
         "Modern sea",
-        "modern sea"
+        "modern sea",
+        "the modern sea",
+        "the modern",
+        "the present",
+        "the present day",
         "Hyundai's",
         "the modern sea",
     ],
