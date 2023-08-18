@@ -11,7 +11,10 @@ def invert_dictionary(dictionary):
 def extract_info_from_tags(question):
     inverted_company_names = invert_dictionary(company_names_extended)
     tags = bioes_tagging(question)
+    print(tags)
+
     words = question.split()
+    print(words)
     info_dict = {}
     #완
     # Extract age
@@ -175,10 +178,11 @@ def extract_info_from_tags(question):
     if updated_company_name_tags:
         companies = []
         for i in updated_company_name_tags:
+            print(i)
             companies.append(inverted_company_names.get(i, []))
         companies = [item for item in companies if item]
         info_dict['Company Name'] = companies
-
+    
     # Extract price index 완
     price_index_tags = [i for i, tag in enumerate(tags) if tag in ["B-priceIndex", "E-priceIndex"]]
     if price_index_tags:

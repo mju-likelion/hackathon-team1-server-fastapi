@@ -22,6 +22,8 @@ company_names_extended = {
     "Hyundai Marine & Fire Insurance": [
         "Hyundai Marine & Fire",
         "Hyundai",
+        "Modern sea",
+        "modern sea"
         "Hyundai's",
         "the modern sea",
     ],
