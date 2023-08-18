@@ -163,6 +163,7 @@ def extract_info_from_tags(question):
     insurance_type_map = {
         "medical-free":"ActualCost",
         "no medical history":"ActualCost",
+        "disease" : "PreExistingConditionActualCost",
         "disease-free":"ActualCost",
         "healthcare-free":"ActualCost",
         "sick person":"PreExistingConditionActualCost",

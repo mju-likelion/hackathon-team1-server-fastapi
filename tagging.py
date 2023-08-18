@@ -49,6 +49,7 @@ company_names_extended = {
 insuranceType_list = [
     "medical-free",
     "no medical history",
+    "disease",
     "disease-free",
     "healthcare-free",
     "higher risk of getting sick",
@@ -64,7 +65,6 @@ insuranceType_list = [
     "health issues in the past."
     "suffered from diseases.",
 ]
-
 
 # Convert tags to BIOES format
 def convert_to_bioes(tags):
@@ -235,7 +235,6 @@ def bioes_tagging(question):
         # Check for registrationType
         registration_types = [
             "consultation-free",
-            
             "online",
             "consultation",
             "online-registration",
