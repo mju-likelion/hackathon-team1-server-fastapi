@@ -181,8 +181,9 @@ def bioes_tagging(question):
             "less",
             "around",
             "below",
+            "more",
             "under",
-            "less than",
+            "less",
         ]
 
         # for price_type in price_range_types:
@@ -204,6 +205,7 @@ def bioes_tagging(question):
             "most expensive",
             "very expensive",
             "most affordable",
+            "up",
             "cheapest",
             "mid-range",
             "luxurious",

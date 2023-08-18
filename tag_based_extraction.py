@@ -39,8 +39,8 @@ def extract_info_from_tags(question):
     }
     gender_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-Gender"]
     if gender_tags:
-        cleaned_gender_tag = gender_tags[0].replace(',', '')  
-        info_dict['Gender'] = cleaned_gender_tag
+        cleaned_gender_tag = gender_tags[0].replace(',', '') 
+        info_dict['Gender'] = gender_map[cleaned_gender_tag]
 
     #완
     insurance_price_tags = [i for i, tag in enumerate(tags) if tag == "E-insurancePrice"]
@@ -56,11 +56,10 @@ def extract_info_from_tags(question):
             "or over": 'over',
             "over": 'over',
             "less": 'less',
+            "more" : "over",
             "around": 'around',
             "below": 'less',
             "under": 'less',
-            "up": 'over',
-            "less than": 'less',
     }
     
     #이상 이하 범위 리턴 완
@@ -97,13 +96,14 @@ def extract_info_from_tags(question):
             "mid-range": "mid",
             "luxurious":"max",
             "economical":"mid",
+            "up":"max"
     }
      
     # 최대 최소 필터링 로직
     insurance_price_minmax_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-minmaxInsurancePriceRange"]
     insurance_price_minmax_range_list = []    
     for insurance_price_minmax, range_word in insurance_price_minmax_range_tags:
-        range_list = [minmax_map[range_word.replace(",", "")]]
+        range_list = [minmax_map[range_word]]
         window_size = 4
         start_idx = max(0, insurance_price_minmax - window_size)
         end_idx = min(len(tags), insurance_price_minmax + window_size + 1)
@@ -212,5 +212,4 @@ def extract_info_from_tags(question):
     registration_type_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-registrationType"]
     if registration_type_tags:
         info_dict['Registration Type'] = registration_type_map[' '.join(registration_type_tags)]
-
     return info_dict
