@@ -39,7 +39,7 @@ def extract_info_from_tags(question):
     }
     gender_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-Gender"]
     if gender_tags:
-        cleaned_gender_tag = gender_tags[0].replace(',', '') 
+        cleaned_gender_tag = gender_tags[0].replace(',', '').replace('.', '')
         info_dict['Gender'] = gender_map[cleaned_gender_tag]
 
     #완
@@ -63,30 +63,63 @@ def extract_info_from_tags(question):
     }
     
     #이상 이하 범위 리턴 완
-    insurance_price_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-insurancePriceRange"]
-    insurance_price_range_list = []    
-    for insurance_price_range, range_word in insurance_price_range_tags:
-        range_list = [range_map[range_word]]
-        window_size = 4
-        start_idx = max(0, insurance_price_range - window_size)
-        end_idx = min(len(tags), insurance_price_range + window_size + 1)
+    # insurance_price_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-insurancePriceRange"]
+    # insurance_price_range_list = []    
+    # for insurance_price_range, range_word in insurance_price_range_tags:
+    #     range_list = [range_map[range_word]]
+    #     window_size = 4
+    #     start_idx = max(0, insurance_price_range - window_size)
+    #     end_idx = min(len(tags), insurance_price_range + window_size + 1)
 
-        # Extract values from context
-        for idx in range(start_idx, end_idx):
-            if tags[idx] == 'S-Age':
-                range_list.append('age')
-                break
-            elif tags[idx] == 'E-insurancePrice':
-                range_list.append('price')
-                break
-            elif tags[idx] == 'E-priceIndex':
-                range_list.append('priceIndex')
-                break
+    #     # Extract values from context
+    #     for idx in range(start_idx, end_idx):
+    #         if tags[idx] == 'S-Age':
+    #             range_list.append('age')
+    #             break
+    #         elif tags[idx] == 'E-insurancePrice':
+    #             range_list.append('price')
+    #             break
+    #         elif tags[idx] == 'E-priceIndex':
+    #             range_list.append('priceIndex')
+    #             break
         
+    #     insurance_price_range_list.append(range_list)
+        
+    # if insurance_price_range_list:
+    #     info_dict['Insurance Price Range Index'] = insurance_price_range_list
+
+    insurance_price_range_tags = [(i, words[i]) for i, tag in enumerate(tags) if tag == "E-insurancePriceRange"]
+    insurance_price_range_list = []
+
+    tag_mapping = {
+        'S-Age': 'age',
+        'E-insurancePrice': 'price',
+        'E-priceIndex': 'priceIndex'
+    }
+
+    for insurance_price_range, range_word in insurance_price_range_tags:
+        found = False
+        window_size = 1
+        range_list = [range_map[range_word]]
+
+        while not found:
+            start_idx = max(0, insurance_price_range - window_size)
+            end_idx = min(len(tags), insurance_price_range + window_size + 1)
+
+            for idx in range(start_idx, end_idx):
+                if tags[idx] in tag_mapping:
+                    range_list.append(tag_mapping[tags[idx]])
+                    found = True
+                    break
+
+            if not found:
+                window_size += 1
+
         insurance_price_range_list.append(range_list)
-        
+
     if insurance_price_range_list:
         info_dict['Insurance Price Range Index'] = insurance_price_range_list
+
 
     minmax_map = {
        "most expensive": "max",
@@ -199,6 +232,7 @@ def extract_info_from_tags(question):
             "consultation-free":"online",
             "consultation free":"online",
             "online-registration":"online",
+            "consultation":"agent",
             "in-person visit":"visit",
             "mail-in application":"mail",
             "Agent-assisted":"agent",
@@ -207,6 +241,7 @@ def extract_info_from_tags(question):
             "Phone Enrollment":"agent",
             "phone enrollment":"agent",
             "agent":"agent",
+            "online":"online"
     }
     # Extract registration type 
     registration_type_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-registrationType"]
