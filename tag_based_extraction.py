@@ -1,8 +1,5 @@
-import pandas as pd
-
 import re
-# sys.path.append('tagging_logic')
-from tagging import bioes_tagging, company_names_extended  
+from tagging import bioes_tagging, company_names_extended  # Gridworld 라이브러리 import
 
 def invert_dictionary(dictionary):
     inverted_dict = {}
@@ -39,7 +36,8 @@ def extract_info_from_tags(question):
     }
     gender_tags = [words[i] for i, tag in enumerate(tags) if tag == "E-Gender"]
     if gender_tags:
-        info_dict['Gender'] = gender_map[gender_tags[0]]
+        cleaned_gender_tag = gender_tags[0].replace(',', '')  
+        info_dict['Gender'] = cleaned_gender_tag
 
     #완
     insurance_price_tags = [i for i, tag in enumerate(tags) if tag == "E-insurancePrice"]
@@ -147,40 +145,39 @@ def extract_info_from_tags(question):
     insurance_type_tags = [words[i] for i, tag in enumerate(tags) if tag in ["E-insuranceType", "B-insuranceType"]]
     if insurance_type_tags:
         info_dict['Insurance Type'] = insurance_type_map[' '.join(insurance_type_tags)]
-        
-    # # Extract company name 완
-    company_name_tags = []
+
+# 수정된 company_name_tags를 저장할 새로운 리스트를 만듭니다.
+    updated_company_name_tags = []
+
     i = 0  # 인덱스 변수 초기화
     while i < len(tags):
         tag = tags[i]
-        
+
         if tag == "I-companyName":
             start_idx = i
             company_name = " ".join(words[start_idx:start_idx+2]).replace(",", "")
-            company_name_tags.append(company_name)
+            updated_company_name_tags.append(company_name)
             for _ in range(2):
                 tags.pop(start_idx)
                 words.pop(start_idx)
         elif tag == "B-companyName":
             start_idx = i
-            company_name_tags.append(words[start_idx].replace(",", ""))
+            updated_company_name_tags.append(words[start_idx].replace(",", ""))
             tags.pop(start_idx)
             words.pop(start_idx)
         elif tag == "E-companyName":
-            company_name_tags.append(words[i].replace(",", ""))
+            updated_company_name_tags.append(words[i].replace(",", ""))
             tags.pop(i)
             words.pop(i)
         else:
             i += 1  # 다음 인덱스로 이동
 
-    
-    if company_name_tags:
-        companys = []
-        for i in company_name_tags:
-            companys.append(inverted_company_names.get(i, []))
-    companys = [item for item in companys if item]
-    info_dict['Company Name'] = companys
-
+    if updated_company_name_tags:
+        companies = []
+        for i in updated_company_name_tags:
+            companies.append(inverted_company_names.get(i, []))
+        companies = [item for item in companies if item]
+        info_dict['Company Name'] = companies
 
     # Extract price index 완
     price_index_tags = [i for i, tag in enumerate(tags) if tag in ["B-priceIndex", "E-priceIndex"]]
@@ -212,5 +209,4 @@ def extract_info_from_tags(question):
     if registration_type_tags:
         info_dict['Registration Type'] = registration_type_map[' '.join(registration_type_tags)]
 
-    
     return info_dict
